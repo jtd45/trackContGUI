@@ -12,8 +12,10 @@ public class TrackContGUI extends JFrame {
 	private final JButton 	plcButt   	= new JButton("ENTER");
 	private final JLabel 	sectName 	= new JLabel("Sect0");
 	private final JTextArea plcFileEnt	= new JTextArea("Enter PLC file location here");
-	private final JLabel	curentAct	= new JLabel("Standby");
+	private final JLabel	curentAct	= new JLabel("Action: \t\tStandby");
+	private final JLabel	speedLab	= new JLabel("0mph");
 	private BlockPanel[][] sections;
+	String speeds[];
 	
 	int sectNum=0;
 	
@@ -42,11 +44,13 @@ public class TrackContGUI extends JFrame {
 		this.add(placeJComponent(sectName,60,40,100,30));
 		this.add(placeJComponent(plcFileEnt,10,10,150,30));
 		this.add(placeJComponent(curentAct,10,350,150,30));
+		this.add(placeJComponent(speedLab,10,320,150,30));
 		
 		this.setVisible(true);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSections();
 		update(0);
+		speedLab.setText(speeds[0]);
 	}
 	
 	private void setSections(){
@@ -65,13 +69,15 @@ public class TrackContGUI extends JFrame {
 				System.out.println();
 				if(firstLine){
 					TOTALSECTIONS=Integer.parseInt(data[0]);
-					sections=new BlockPanel[3][4];
+					sections=new BlockPanel[TOTALSECTIONS][4];
+					speeds=new String[TOTALSECTIONS];
 					firstLine=false;
 				}else{
 					if(data[0].equals("S")){
 						System.out.println("in S\n");
 						sectLength=Integer.parseInt(data[2]);
 						sections[sNum]=new BlockPanel[sectLength];
+						speeds[sNum]=new String("Speed limit: \t\t"+data[3]+"mph");
 						for(blockNum=0;blockNum<sectLength;++blockNum){
 							curLineS=br.readLine();
 							data=curLineS.split(",");
@@ -85,7 +91,6 @@ public class TrackContGUI extends JFrame {
 		}catch(IOException e){
 			System.out.println("failed to load file");
 		}
-		
 	}
 
 	private JButton makeButton(JButton b,int x,int y,int l,int w,ActionListener actLis){
@@ -105,6 +110,7 @@ public class TrackContGUI extends JFrame {
 			sectNum++;
 			sectName.setText("Sect"+sectNum);
 			update(sectNum);
+			speedLab.setText(speeds[sectNum]);
 		}
 	}
 	public void prevTrackCont(){
@@ -113,6 +119,7 @@ public class TrackContGUI extends JFrame {
 			sectNum--;
 			sectName.setText("Sect"+sectNum);
 			update(sectNum);
+			speedLab.setText(speeds[sectNum]);
 		}
 	}
 	public void enterPLCCode(){
